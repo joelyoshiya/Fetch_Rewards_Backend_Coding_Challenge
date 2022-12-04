@@ -8,20 +8,26 @@ import (
 
 // define structs
 type item struct {
-	ShortDescription string  `json:"shortDescription"`
-	Price            float64 `json:"price"`
+	ShortDescription string  `json:"shortDescription"` // from client
+	Price            float64 `json:"price"`            // from client
 }
 
 type items struct {
-	Items []item `json:"items"`
+	Items []item `json:"items"` // from client
 }
 
 type receipt struct {
-	Retailer     string  `json:"retailer"`
-	PurchaseDate string  `json:"purchaseDate"`
-	PurchaseTime string  `json:"purchaseTime"`
-	Total        float64 `json:"total"`
-	Items        []item  `json:"items"`
+	ID           string  `json:"id"`           // from service
+	Points       int     `json:"points"`       // from service
+	Retailer     string  `json:"retailer"`     // from client
+	PurchaseDate string  `json:"purchaseDate"` // from client
+	PurchaseTime string  `json:"purchaseTime"` // from client
+	Total        float64 `json:"total"`        // from client
+	Items        []item  `json:"items"`        // from client
+}
+
+type receipts struct {
+	Receipts []receipt `json:"receipts"`
 }
 
 // setup router
