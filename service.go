@@ -101,15 +101,13 @@ func processReceipt(c *gin.Context) {
 		return
 	}
 
-	// loop through items
-
-	// generate points
+	// generate points?
 
 	// append to global Receipts object's map
-	(*rs).ReceiptsMap[r.ID] = r
+	(*rs).ReceiptsMap[id] = r
 
 	// return status created and receipt ID
-	c.IndentedJSON(http.StatusCreated, gin.H{"id": r.ID})
+	c.IndentedJSON(http.StatusCreated, gin.H{"id": id})
 
 }
 
