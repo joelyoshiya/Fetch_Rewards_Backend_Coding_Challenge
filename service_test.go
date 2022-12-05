@@ -57,6 +57,7 @@ var body2 = []byte(`{
 	"total": "9.00"
   }`)
 
+// body with no purchaseDate entry - should fail
 var body_bad_1 = []byte(`{
 	"retailer": "M&M Corner Market",
 	"purchaseDate": "",
@@ -205,6 +206,20 @@ func TestGetPoints_2(t *testing.T) {
 }
 
 // TODO - write tests with various types of bad input
+func TestProcessReceipt_No_Date(t *testing.T) {
+	// set up router, recorder, and request
+	router := setupRouter()
+	w := httptest.NewRecorder()
+	req, err := http.NewRequest(http.MethodPost, "/receipts/process", bytes.NewBuffer(body_bad_1))
+	if err != nil {
+		t.Fatal(err)
+	}
+	router.ServeHTTP(w, req)
+
+	// assert response
+	assert.Equal(t, http.StatusBadRequest, w.Code)
+	assert.Contains(t, w.Body.String(), "\"description\":\"The receipt is invalid\"")
+}
 
 // TODO - consider other edge cases other than bad input
 
