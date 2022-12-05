@@ -2,6 +2,8 @@ package main
 
 import (
 	"net/http"
+	"strconv"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -62,7 +64,6 @@ func setupRouter() *gin.Engine {
 	r.POST("/receipts/process", processReceipt)
 	// get points
 	r.GET("/receipts/:id/points", getPoints)
-
 	return r
 }
 
@@ -74,9 +75,80 @@ func main() {
 }
 
 // Internal functions
+
+// These rules collectively define how many points should be awarded to a receipt.
+// One point for every alphanumeric character in the retailer name.
+// 50 points if the total is a round dollar amount with no cents.
+// 25 points if the total is a multiple of 0.25
+// 5 points for every two items on the receipt.
+// If the trimmed length of the item description is a multiple of 3, multiply the price by 0.2 and round up to the nearest integer. The result is the number of points earned.
+// 6 points if the day in the purchase date is odd.
+// 10 points if the time of purchase is after 2:00pm and before 4:00pm
 func processPoints(r Receipt) int {
 	// process points
-	return 0
+
+	// 1 point for every alphanumeric character in the retailer name.
+	// clean retailer name for whitespace
+	retailer := strings.ReplaceAll(r.Retailer, " ", "")
+	// count alphanumeric characters
+	retailerPoints := len(retailer)
+
+	// 50 points if the total is a round dollar amount with no cents.
+	// 25 points if the total is a multiple of 0.25
+	// parse total to float
+	total, _ := strconv.ParseFloat(r.Total, 64)
+	// check if total is a round dollar amount
+	totalPoints := 0
+	if total == float64(int(total)) {
+		totalPoints = 50
+	} else if total == float64(int(total*4))/4 {
+		totalPoints = 25
+	}
+
+	// 5 points for every two items on the receipt.
+	// count items
+	itemCount := len(r.Items)
+	// calculate points
+	itemPoints := itemCount / 2
+
+	// If the trimmed length of the item description is a multiple of 3, multiply the price by 0.2 and round up to the nearest integer. The result is the number of points earned.
+	for _, item := range r.Items {
+		// clean item description for whitespace
+		itemDesc := strings.ReplaceAll(item.ShortDescription, " ", "")
+		// check if trimmed length of item description is a multiple of 3
+		if len(itemDesc)%3 == 0 {
+			// parse price to float
+			price, _ := strconv.ParseFloat(item.Price, 64)
+			// calculate points
+			itemPoints += int(price * 0.2) // add to item points for each item
+		}
+	}
+	// 6 points if the day in the purchase date is odd.
+	// parse purchase date to int
+	datePoints := 0
+	// clean purchase date for whitespace and dashes
+	purchaseDate := strings.ReplaceAll(r.PurchaseDate, " ", "")
+	purchaseDate = strings.ReplaceAll(purchaseDate, "-", "")
+	// parse purchase date to int
+	purchaseDateInt, _ := strconv.Atoi(purchaseDate)
+	// check if day is odd
+	if purchaseDateInt%2 != 0 {
+		datePoints += 6
+	}
+
+	// 10 points if the time of purchase is after 2:00pm and before 4:00pm
+	timePoints := 0
+	// clean purchase time for whitespace and colons
+	purchaseTime := strings.ReplaceAll(r.PurchaseTime, " ", "")
+	purchaseTime = strings.ReplaceAll(purchaseTime, ":", "")
+	// parse purchase time to int
+	purchaseTimeInt, _ := strconv.Atoi(purchaseTime)
+	// check if time is between 2:00pm and 4:00pm
+	if purchaseTimeInt > 1400 && purchaseTimeInt < 1600 {
+		timePoints += 10
+	}
+
+	return retailerPoints + totalPoints + itemPoints + datePoints + timePoints
 }
 
 // Route Functions
