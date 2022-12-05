@@ -127,9 +127,10 @@ func processPoints(r Receipt) int {
 	// 6 points if the day in the purchase date is odd.
 	// parse purchase date to int
 	datePoints := 0
-	// clean purchase date for whitespace and dashes
-	purchaseDate := strings.ReplaceAll(r.PurchaseDate, " ", "")
-	purchaseDate = strings.ReplaceAll(purchaseDate, "-", "")
+	// define a non numeric regex
+	nonNumericRegex := regexp.MustCompile("[^0-9]+")
+	// clean purchase date for non numeric characters
+	purchaseDate := nonNumericRegex.ReplaceAllString(r.PurchaseDate, "")
 	// parse purchase date to int
 	purchaseDateInt, _ := strconv.Atoi(purchaseDate)
 	// check if day is odd
@@ -139,9 +140,8 @@ func processPoints(r Receipt) int {
 
 	// 10 points if the time of purchase is after 2:00pm and before 4:00pm
 	timePoints := 0
-	// clean purchase time for whitespace and colons
-	purchaseTime := strings.ReplaceAll(r.PurchaseTime, " ", "")
-	purchaseTime = strings.ReplaceAll(purchaseTime, ":", "")
+	// clean purchase time for non numeric characters
+	purchaseTime := nonNumericRegex.ReplaceAllString(r.PurchaseTime, "")
 	// parse purchase time to int
 	purchaseTimeInt, _ := strconv.Atoi(purchaseTime)
 	// check if time is between 2:00pm and 4:00pm
