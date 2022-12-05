@@ -73,7 +73,7 @@ func setupRouter() *gin.Engine {
 func main() {
 	r := setupRouter()
 	// run server
-	r.Run() // listen and serve on default port 8080
+	r.Run() // listen and serve on default port 8080 - otherwise port defined in env variable PORT
 }
 
 // Internal functions
@@ -180,9 +180,20 @@ func processReceipt(c *gin.Context) {
 	// generate ID
 	id := uuid.New().String()
 
-	// TODO write logic to determine bad receipt, return error
 	// bind JSON to receipt object - upon error, return bad request
-	if err := c.BindJSON(&r); err != nil {
+	// unmarshaling JSON to struct, type checking for all fields
+	if err := c.ShouldBindJSON(&r); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"description": "The receipt is invalid"})
+		return
+	}
+	// check if all fields populated
+	if r.Retailer == "" || r.Total == "" || r.PurchaseDate == "" || r.PurchaseTime == "" || r.Items == nil {
+		c.JSON(http.StatusBadRequest, gin.H{"description": "The receipt is invalid"})
+		return
+	}
+
+	// check if r.Items meets minimum length requirement of 1
+	if r.Items != nil && len(r.Items) < 1 {
 		c.JSON(http.StatusBadRequest, gin.H{"description": "The receipt is invalid"})
 		return
 	}
