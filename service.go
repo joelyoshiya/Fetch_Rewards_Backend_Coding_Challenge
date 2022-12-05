@@ -1,7 +1,10 @@
 package main
 
 import (
+	"fmt"
+	"math"
 	"net/http"
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -88,8 +91,12 @@ func processPoints(r Receipt) int {
 	// process points
 
 	// 1 point for every alphanumeric character in the retailer name.
-	// clean retailer name for whitespace
-	retailer := strings.ReplaceAll(r.Retailer, " ", "")
+	// clean retailer name for non alphanumeric characters
+	// define regex for alphanumeric characters
+	regex := regexp.MustCompile("[^a-zA-Z0-9]+")
+	// replace non alphanumeric characters with empty string
+	retailer := regex.ReplaceAllString(r.Retailer, "")
+
 	// count alphanumeric characters
 	retailerPoints := len(retailer)
 
@@ -100,27 +107,29 @@ func processPoints(r Receipt) int {
 	// check if total is a round dollar amount
 	totalPoints := 0
 	if total == float64(int(total)) {
-		totalPoints = 50
-	} else if total == float64(int(total*4))/4 {
-		totalPoints = 25
+		totalPoints += 50
+	}
+	if total == float64(int(total*4))/4 {
+		totalPoints += 25
 	}
 
 	// 5 points for every two items on the receipt.
 	// count items
 	itemCount := len(r.Items)
 	// calculate points
-	itemPoints := itemCount / 2
+	itemCountPoints := (itemCount / 2) * 5
 
 	// If the trimmed length of the item description is a multiple of 3, multiply the price by 0.2 and round up to the nearest integer. The result is the number of points earned.
+	itemPoints := 0
 	for _, item := range r.Items {
-		// clean item description for whitespace
-		itemDesc := strings.ReplaceAll(item.ShortDescription, " ", "")
-		// check if trimmed length of item description is a multiple of 3
+		// trim the item description
+		itemDesc := strings.Trim(item.ShortDescription, " ")
+		// check if trimmmed length of item description is a multiple of 3
 		if len(itemDesc)%3 == 0 {
 			// parse price to float
 			price, _ := strconv.ParseFloat(item.Price, 64)
 			// calculate points
-			itemPoints += int(price * 0.2) // add to item points for each item
+			itemPoints += int(math.Ceil(price * 0.2)) // add to item points for each item
 		}
 	}
 	// 6 points if the day in the purchase date is odd.
@@ -148,7 +157,15 @@ func processPoints(r Receipt) int {
 		timePoints += 10
 	}
 
-	return retailerPoints + totalPoints + itemPoints + datePoints + timePoints
+	// print all points to see if values are correct
+	fmt.Println("retailerPoints: ", retailerPoints)
+	fmt.Println("totalPoints: ", totalPoints)
+	fmt.Println("itemCountPoints: ", itemCountPoints)
+	fmt.Println("itemPoints: ", itemPoints)
+	fmt.Println("datePoints: ", datePoints)
+	fmt.Println("timePoints: ", timePoints)
+
+	return retailerPoints + totalPoints + itemCountPoints + itemPoints + datePoints + timePoints
 }
 
 // Route Functions
