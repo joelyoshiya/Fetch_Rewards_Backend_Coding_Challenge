@@ -17,16 +17,6 @@ type Items struct {
 	Items []Item `json:"items"` // from client
 }
 
-type ServerReceipt struct {
-	ID           string  `json:"id"`           // from service
-	Points       int     `json:"points"`       // from service
-	Retailer     string  `json:"retailer"`     // from client
-	PurchaseDate string  `json:"purchaseDate"` // from client
-	PurchaseTime string  `json:"purchaseTime"` // from client
-	Total        float64 `json:"total"`        // from client
-	Items        []Item  `json:"items"`        // from client
-}
-
 // struct representing inbound receipt
 type Receipt struct {
 	Retailer     string `json:"retailer"`
@@ -39,14 +29,22 @@ type Receipt struct {
 	Total string `json:"total"`
 }
 
+// struct representing Receipt Points pair
+type ReceiptPoints struct {
+	Receipt Receipt `json:"receipt"`
+	Points  int     `json:"points"`
+}
+
+// struct representing Receipts
 type Receipts struct {
-	ReceiptsMap map[string]Receipt `json:"receipts"` // map of receipts, key is ID
+	// store a map of receipts, points pairs accessed via ID
+	ReceiptsMap map[string]ReceiptPoints `json:"receipts"`
 }
 
 // constructor for receipts
 func NewReceipts() *Receipts {
 	var rs Receipts
-	rs.ReceiptsMap = make(map[string]Receipt)
+	rs.ReceiptsMap = make(map[string]ReceiptPoints)
 	return &rs
 }
 
@@ -75,6 +73,12 @@ func main() {
 	r.Run(":8080")
 }
 
+// Internal functions
+func processPoints(r Receipt) int {
+	// process points
+	return 0
+}
+
 // Route Functions
 
 // Path: /receipts/process
@@ -101,14 +105,14 @@ func processReceipt(c *gin.Context) {
 		return
 	}
 
-	// generate points?
+	// process points
+	points := processPoints(r)
 
-	// append to global Receipts object's map
-	(*rs).ReceiptsMap[id] = r
+	// create a ReceiptPoints object and add to receipts map
+	(*rs).ReceiptsMap[id] = ReceiptPoints{r, points}
 
 	// return status created and receipt ID
 	c.IndentedJSON(http.StatusCreated, gin.H{"id": id})
-
 }
 
 // Path: /receipts/{id}/points
