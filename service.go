@@ -82,6 +82,7 @@ func main() {
 func processPoints(r Receipt) int {
 	// process points
 
+	// referring to: https://gosamples.dev/remove-non-alphanumeric/
 	// 1 point for every alphanumeric character in the retailer name.
 	// clean retailer name for non alphanumeric characters
 	// define regex for alphanumeric characters
@@ -97,10 +98,10 @@ func processPoints(r Receipt) int {
 	total, _ := strconv.ParseFloat(r.Total, 64)
 	// check if total is a round dollar amount
 	totalPoints := 0
-	if total == float64(int(total)) {
+	if total == float64(int(total)) { // check if total is a round dollar amount
 		totalPoints += 50
 	}
-	if total == float64(int(total*4))/4 {
+	if total == float64(int(total*4))/4 { // check if total is a multiple of 0.25
 		totalPoints += 25
 	}
 

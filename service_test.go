@@ -184,3 +184,7 @@ func TestGetPoints_2(t *testing.T) {
 	// check if points valid
 	assert.Equal(t, body2_pts, int(points))
 }
+
+// TODO - write tests with various types of bad input
+
+// TODO - consider other edge cases other than bad input
