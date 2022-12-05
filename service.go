@@ -197,12 +197,12 @@ func getPoints(c *gin.Context) {
 	// get ID
 	id := c.Param("id")
 	// get receipt object with ID from receipts
-	r, present := (*rs).ReceiptsMap[id]
+	rp, present := (*rs).ReceiptsMap[id]
 	if !present {
 		c.IndentedJSON(http.StatusNotFound, gin.H{"error": "receipt not found"})
 		return
 	} else {
-		c.IndentedJSON(http.StatusOK, gin.H{"points": r.Points})
+		c.IndentedJSON(http.StatusOK, gin.H{"points": rp.Points})
 	}
 
 }
