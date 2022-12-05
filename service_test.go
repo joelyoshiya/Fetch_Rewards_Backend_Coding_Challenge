@@ -93,7 +93,6 @@ func TestProcessReceipt_1(t *testing.T) {
 	// assert response
 	assert.Equal(t, http.StatusCreated, w.Code)
 	assert.Contains(t, w.Body.String(), `"id"`)
-	assert.Contains(t, w.Body.String(), `"points"`)
 
 	// grab id from response
 	var resp map[string]interface{} // referring to: https://bitfieldconsulting.com/golang/map-string-interface
@@ -118,7 +117,6 @@ func TestProcessReceipt_2(t *testing.T) {
 	// assert response
 	assert.Equal(t, http.StatusCreated, w.Code)
 	assert.Contains(t, w.Body.String(), `"id"`)
-	assert.Contains(t, w.Body.String(), `"points"`)
 
 	// grab id from response
 	var resp map[string]interface{} // referring to: https://bitfieldconsulting.com/golang/map-string-interface

@@ -183,6 +183,8 @@ func processReceipt(c *gin.Context) {
 	// create a ReceiptPoints object and add to receipts map
 	(*rs).ReceiptsMap[id] = ReceiptPoints{r, points}
 
+	// TODO write logic to determine bad receipt, return error
+
 	// return status created and receipt ID
 	c.IndentedJSON(http.StatusCreated, gin.H{"id": id})
 }
