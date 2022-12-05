@@ -80,7 +80,6 @@ func main() {
 
 // Calculate points for receipt - based on ruleset given
 func processPoints(r Receipt) int {
-	// process points
 
 	// referring to: https://gosamples.dev/remove-non-alphanumeric/
 	// 1 point for every alphanumeric character in the retailer name.

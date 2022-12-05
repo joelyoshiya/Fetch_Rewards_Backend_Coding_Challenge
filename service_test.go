@@ -57,6 +57,25 @@ var body2 = []byte(`{
 	"total": "9.00"
   }`)
 
+var body_bad_1 = []byte(`{
+	"retailer": "M&M Corner Market",
+	"purchaseDate": "2022-03-20",
+	"purchaseTime": "14:33",
+	"items": [
+	  {
+		"shortDescription": "Gatorade",
+		"price": "2.25"
+	  },{
+		"shortDescription": "Gatorade",
+		"price": "2.25"
+	  },{
+		"shortDescription": "Gatorade",
+		"price": "2.25"
+	  }
+	],
+	"total": "9.00"
+	  }`)
+
 // expected points for body1 and body2
 var body1_pts = 25
 var body2_pts = 109
@@ -188,3 +207,9 @@ func TestGetPoints_2(t *testing.T) {
 // TODO - write tests with various types of bad input
 
 // TODO - consider other edge cases other than bad input
+
+// TODO - how to handle duplicate receipts?
+
+// TODO - how to handle duplicate items within a receipt?
+
+// TODO - how to handle duplicate items across receipts?
