@@ -144,7 +144,7 @@ func processPoints(r Receipt) int {
 	purchaseTime := nonNumericRegex.ReplaceAllString(r.PurchaseTime, "")
 	// parse purchase time to int
 	purchaseTimeInt, _ := strconv.Atoi(purchaseTime)
-	// check if time is between 2:00pm and 4:00pm
+	// check if time is between 2:00pm and 4:00pm (after and before 1400 and 1600)
 	if purchaseTimeInt > 1400 && purchaseTimeInt < 1600 {
 		timePoints += 10
 	}
@@ -182,7 +182,7 @@ func processReceipt(c *gin.Context) {
 
 	// bind JSON to receipt object
 	if err := c.BindJSON(&r); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"description": "The receipt is invalid"})
 		return
 	}
 
@@ -208,7 +208,7 @@ func getPoints(c *gin.Context) {
 	// get receipt object with ID from receipts
 	rp, present := (*rs).ReceiptsMap[id]
 	if !present {
-		c.IndentedJSON(http.StatusNotFound, gin.H{"error": "receipt not found"})
+		c.IndentedJSON(http.StatusNotFound, gin.H{"description": "No receipt found for that id"})
 		return
 	} else {
 		c.IndentedJSON(http.StatusOK, gin.H{"points": rp.Points})
