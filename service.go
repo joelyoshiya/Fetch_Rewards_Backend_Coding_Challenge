@@ -91,6 +91,9 @@ func processReceipt(c *gin.Context) {
 	// append to global Receipts object's map
 	(*rs).ReceiptsMap[r.ID] = r
 
+	// return status created and receipt ID
+	c.IndentedJSON(http.StatusCreated, gin.H{"id": r.ID})
+
 }
 
 // Path: /receipts/{id}/points
@@ -99,7 +102,14 @@ func processReceipt(c *gin.Context) {
 // A simple Getter endpoint that looks up the receipt by the ID and returns an object specifying the points awarded.
 func getPoints(c *gin.Context) {
 	// get ID
+	id := c.Param("id")
 	// get receipt object with ID from receipts
-	// get points from receipt object
+	r, present := (*rs).ReceiptsMap[id]
+	if !present {
+		c.IndentedJSON(http.StatusNotFound, gin.H{"error": "receipt not found"})
+		return
+	} else {
+		c.IndentedJSON(http.StatusOK, gin.H{"points": r.Points})
+	}
 
 }
