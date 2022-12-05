@@ -2,7 +2,6 @@ package main
 
 import (
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -18,7 +17,7 @@ type Items struct {
 	Items []Item `json:"items"` // from client
 }
 
-type Receipt struct {
+type ServerReceipt struct {
 	ID           string  `json:"id"`           // from service
 	Points       int     `json:"points"`       // from service
 	Retailer     string  `json:"retailer"`     // from client
@@ -26,6 +25,18 @@ type Receipt struct {
 	PurchaseTime string  `json:"purchaseTime"` // from client
 	Total        float64 `json:"total"`        // from client
 	Items        []Item  `json:"items"`        // from client
+}
+
+// struct representing inbound receipt
+type Receipt struct {
+	Retailer     string `json:"retailer"`
+	PurchaseDate string `json:"purchaseDate"`
+	PurchaseTime string `json:"purchaseTime"`
+	Items        []struct {
+		ShortDescription string `json:"shortDescription"`
+		Price            string `json:"price"`
+	} `json:"items"`
+	Total string `json:"total"`
 }
 
 type Receipts struct {
@@ -79,24 +90,17 @@ func processReceipt(c *gin.Context) {
 	// New items, receipt objects
 	// var i Items
 	var r Receipt
+	// var s ServerReceipt
 
 	// generate ID
-	r.ID = uuid.New().String()
-	// get retailer
-	r.Retailer = c.PostForm("retailer")
-	// get purchase date - TODO validation
-	r.PurchaseDate = c.PostForm("purchaseDate")
-	// get purchase time - TODO validation
-	r.PurchaseTime = c.PostForm("purchaseTime")
-	// get total - convert to float
-	var parse_err error
-	r.Total, parse_err = strconv.ParseFloat(c.PostForm("total"), 64)
-	if parse_err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": parse_err.Error()})
+	id := uuid.New().String()
+
+	// bind JSON to receipt object
+	if err := c.BindJSON(&r); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	// get items
-	var items = c.PostFormArray("items")
+
 	// loop through items
 
 	// generate points
