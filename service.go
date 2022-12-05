@@ -33,13 +33,13 @@ type Receipt struct {
 	Total string `json:"total"`
 }
 
-// struct representing Receipt Points pair
+// struct representing Receipt Points pair - used for storing receipts/points
 type ReceiptPoints struct {
 	Receipt Receipt `json:"receipt"`
 	Points  int     `json:"points"`
 }
 
-// struct representing Receipts
+// struct representing Receipts - internal storage of receipts/points
 type Receipts struct {
 	// store a map of receipts, points pairs accessed via ID
 	ReceiptsMap map[string]ReceiptPoints `json:"receipts"`
@@ -73,7 +73,7 @@ func setupRouter() *gin.Engine {
 func main() {
 	r := setupRouter()
 	// run server
-	r.Run(":8080")
+	r.Run() // listen and serve on default port 8080
 }
 
 // Internal functions
@@ -180,7 +180,8 @@ func processReceipt(c *gin.Context) {
 	// generate ID
 	id := uuid.New().String()
 
-	// bind JSON to receipt object
+	// TODO write logic to determine bad receipt, return error
+	// bind JSON to receipt object - upon error, return bad request
 	if err := c.BindJSON(&r); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"description": "The receipt is invalid"})
 		return
@@ -191,8 +192,6 @@ func processReceipt(c *gin.Context) {
 
 	// create a ReceiptPoints object and add to receipts map
 	(*rs).ReceiptsMap[id] = ReceiptPoints{r, points}
-
-	// TODO write logic to determine bad receipt, return error
 
 	// return status created and receipt ID
 	c.IndentedJSON(http.StatusCreated, gin.H{"id": id})
