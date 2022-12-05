@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"math"
 	"net/http"
 	"regexp"
@@ -96,7 +95,6 @@ func processPoints(r Receipt) int {
 	regex := regexp.MustCompile("[^a-zA-Z0-9]+")
 	// replace non alphanumeric characters with empty string
 	retailer := regex.ReplaceAllString(r.Retailer, "")
-
 	// count alphanumeric characters
 	retailerPoints := len(retailer)
 
@@ -158,12 +156,12 @@ func processPoints(r Receipt) int {
 	}
 
 	// print all points to see if values are correct
-	fmt.Println("retailerPoints: ", retailerPoints)
-	fmt.Println("totalPoints: ", totalPoints)
-	fmt.Println("itemCountPoints: ", itemCountPoints)
-	fmt.Println("itemPoints: ", itemPoints)
-	fmt.Println("datePoints: ", datePoints)
-	fmt.Println("timePoints: ", timePoints)
+	// fmt.Println("retailerPoints: ", retailerPoints)
+	// fmt.Println("totalPoints: ", totalPoints)
+	// fmt.Println("itemCountPoints: ", itemCountPoints)
+	// fmt.Println("itemPoints: ", itemPoints)
+	// fmt.Println("datePoints: ", datePoints)
+	// fmt.Println("timePoints: ", timePoints)
 
 	return retailerPoints + totalPoints + itemCountPoints + itemPoints + datePoints + timePoints
 }
