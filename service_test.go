@@ -57,8 +57,13 @@ var body2 = []byte(`{
 	"total": "9.00"
   }`)
 
+// expected points for body1 and body2
 var body1_pts = 25
 var body2_pts = 109
+
+// set upon successful return of TestProcessReceipt_1 and TestProcessReceipt_2
+var body1_id string
+var body2_id string
 
 func TestPingRoute(t *testing.T) {
 	// set up router, recorder, and request
@@ -74,7 +79,7 @@ func TestPingRoute(t *testing.T) {
 	assert.Equal(t, "pong", w.Body.String())
 }
 
-func TestProcessReceipt(t *testing.T) {
+func TestProcessReceipt_1(t *testing.T) {
 	// set up router, recorder, and request
 	router := setupRouter()
 	w := httptest.NewRecorder()
@@ -89,30 +94,54 @@ func TestProcessReceipt(t *testing.T) {
 	assert.Equal(t, http.StatusCreated, w.Code)
 	assert.Contains(t, w.Body.String(), `"id"`)
 	assert.Contains(t, w.Body.String(), `"points"`)
+
+	// grab id from response
+	var resp map[string]interface{} // referring to: https://bitfieldconsulting.com/golang/map-string-interface
+	err2 := json.Unmarshal(w.Body.Bytes(), &resp)
+	if err2 != nil {
+		t.Fatal(err)
+	}
+	body1_id = resp["id"].(string)
+
 }
 
-func TestGetPoints(t *testing.T) {
+func TestProcessReceipt_2(t *testing.T) {
 	// set up router, recorder, and request
 	router := setupRouter()
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest(http.MethodPost, "/receipts/process", bytes.NewBuffer(body2))
+	req, err := http.NewRequest(http.MethodPost, "/receipts/process", bytes.NewBuffer(body2))
+	if err != nil {
+		t.Fatal(err)
+	}
 	router.ServeHTTP(w, req)
 
+	// assert response
 	assert.Equal(t, http.StatusCreated, w.Code)
 	assert.Contains(t, w.Body.String(), `"id"`)
 	assert.Contains(t, w.Body.String(), `"points"`)
 
 	// grab id from response
 	var resp map[string]interface{} // referring to: https://bitfieldconsulting.com/golang/map-string-interface
-	err := json.Unmarshal(w.Body.Bytes(), &resp)
+	err2 := json.Unmarshal(w.Body.Bytes(), &resp)
+	if err2 != nil {
+		t.Fatal(err2)
+	}
+	body2_id = resp["id"].(string)
+}
+
+func TestGetPoints_1(t *testing.T) {
+	// make sure body1_id is set
+	assert.NotEmpty(t, body1_id)
+
+	// set up router, recorder, and request
+	router := setupRouter()
+	w := httptest.NewRecorder()
+
+	// use body1_id to query for points
+	req, err := http.NewRequest(http.MethodGet, "/receipts/"+body1_id+"/points", nil)
 	if err != nil {
 		t.Fatal(err)
 	}
-	id := resp["id"].(string)
-
-	// use id to query for points
-	w = httptest.NewRecorder()
-	req, _ = http.NewRequest(http.MethodGet, "/receipts/"+id+"/points", nil)
 	router.ServeHTTP(w, req)
 
 	assert.Equal(t, http.StatusOK, w.Code)
@@ -121,7 +150,36 @@ func TestGetPoints(t *testing.T) {
 	var resp2 map[string]interface{} // referring to: https://bitfieldconsulting.com/golang/map-string-interface
 	err2 := json.Unmarshal(w.Body.Bytes(), &resp2)
 	if err2 != nil {
+		t.Fatal(err2)
+	}
+	points := resp2["points"].(float64)
+
+	// check if points valid
+	assert.Equal(t, body1_pts, int(points))
+
+}
+func TestGetPoints_2(t *testing.T) {
+	// make sure body2_id is set
+	assert.NotEmpty(t, body2_id)
+
+	// set up router, recorder, and request
+	router := setupRouter()
+	w := httptest.NewRecorder()
+
+	// use body2_id to query for points
+	req, err := http.NewRequest(http.MethodGet, "/receipts/"+body2_id+"/points", nil)
+	if err != nil {
 		t.Fatal(err)
+	}
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+
+	// get points from body:
+	var resp2 map[string]interface{} // referring to: https://bitfieldconsulting.com/golang/map-string-interface
+	err2 := json.Unmarshal(w.Body.Bytes(), &resp2)
+	if err2 != nil {
+		t.Fatal(err2)
 	}
 	points := resp2["points"].(float64)
 
