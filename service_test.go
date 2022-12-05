@@ -59,7 +59,7 @@ var body2 = []byte(`{
 
 var body_bad_1 = []byte(`{
 	"retailer": "M&M Corner Market",
-	"purchaseDate": "2022-03-20",
+	"purchaseDate": "",
 	"purchaseTime": "14:33",
 	"items": [
 	  {
@@ -208,8 +208,8 @@ func TestGetPoints_2(t *testing.T) {
 
 // TODO - consider other edge cases other than bad input
 
-// TODO - how to handle duplicate receipts?
+// TODO - how to handle duplicate receipts? - this should not be allowed
+// Idea - geneate unique ID based on complete receipt body, and check if ID already exists in map
 
-// TODO - how to handle duplicate items within a receipt?
-
-// TODO - how to handle duplicate items across receipts?
+// TODO - how to handle duplicate items within a receipt? - This should be fine, since items can be repeatedly bought within a receipt
+// TODO - how to handle duplicate items across receipts? - This should be fine, since items can be repeatedly bought across receipts
