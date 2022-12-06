@@ -1,3 +1,4 @@
+// referring to: https://github.com/olliefr/docker-gs-ping/blob/main/main_test.go
 package main
 
 import (
