@@ -31,7 +31,7 @@ I've opted to use Docker to run the application. This allows for a consistent en
 
 ### Build
 
-- Run `docker build -t receipt-processor-service .` at the root.
+- Run `docker build -t receipt-processor-service .` at the root of the project.
 
 ### Run
 
@@ -39,8 +39,24 @@ I've opted to use Docker to run the application. This allows for a consistent en
 
 ## Test Environment
 
+- Note: Testing will require Go (version specified in Dockerfile receommended) and Docker to be installed on your machine.
 - Make sure you're on the most up to date build: `docker build -t receipt-processor-service:latest .`
 - Run the command `go test -v ./main` at the root to run the tests.
+
+### Test Classes
+
+- `service_test.go` - tests the service layer
+- `service_docker_test.go` - tests the service layer within a docker container
+
+### Test Cases
+
+- `TestProcessReceipts` - tests the `/receipts/process` endpoint
+  - In the docker test, this also tests the GetPoints endpoint, since test data is isolated (cannot split into two tests)
+- `TestGetPoints` - tests the `/receipts/{id}/points` endpoint
+- `TestProcessReceipts_Bad_*` - tests the process endpoint with bad data, including empty and invalid receipt data
+- `TestGetPoints_Bad_*` - tests the get points endpoint with bad data, including empty and invalid ids
+
+
 
 ## Discussion
 

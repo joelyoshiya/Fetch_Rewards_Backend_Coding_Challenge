@@ -142,6 +142,8 @@ var body_bad_negative_price = []byte(`{
 	"total": "7.75"
 	  }`)
 
+var body_bad_empty = []byte(``)
+
 // expected points for body1 and body2
 var body_valid_1_pts = 25
 var body_valid_2_pts = 109
@@ -336,6 +338,21 @@ func TestProcessReceipt_Bad_Negative_Price(t *testing.T) {
 	router := setupRouter()
 	w := httptest.NewRecorder()
 	req, err := http.NewRequest(http.MethodPost, "/receipts/process", bytes.NewBuffer(body_bad_negative_price))
+	if err != nil {
+		t.Fatal(err)
+	}
+	router.ServeHTTP(w, req)
+
+	// assert response
+	assert.Equal(t, http.StatusBadRequest, w.Code)
+	assert.Contains(t, w.Body.String(), `"The receipt is invalid"`)
+}
+
+func TestProcessReceipt_Bad_Empty_Body(t *testing.T) {
+	// set up router, recorder, and request
+	router := setupRouter()
+	w := httptest.NewRecorder()
+	req, err := http.NewRequest(http.MethodPost, "/receipts/process", bytes.NewBuffer(body_bad_empty))
 	if err != nil {
 		t.Fatal(err)
 	}

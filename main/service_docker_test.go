@@ -144,6 +144,8 @@ var body_bad_negative_price_docker = []byte(`{
 	"total": "7.75"
 	  }`)
 
+var body_bad_empty_docker = []byte(``)
+
 // expected points for body1 and body2
 var body_valid_1_pts_docker = 25
 var body_valid_2_pts_docker = 109
@@ -420,6 +422,31 @@ func TestProcessReceipt_Bad_Negative_Item_Price_Docker(t *testing.T) {
 		var err error
 		var resp *http.Response
 		resp, err = http.Post(fmt.Sprintf("http://localhost:%s/receipts/process", resource.GetPort("8080/tcp")), "application/json", bytes.NewBuffer(body_bad_negative_price_docker))
+		if err != nil {
+			return err
+		}
+		defer resp.Body.Close()
+		if resp.StatusCode != http.StatusBadRequest {
+			return fmt.Errorf("received non-400 response: %d", resp.StatusCode)
+		}
+		return nil
+	}))
+}
+
+func TestProcessReceipt_Bad_Empty_Body_Docker(t *testing.T) {
+	// setup docker
+	pool, err := dockertest.NewPool("")
+	require.NoError(t, err)
+	resource, err := pool.Run("receipt-processor-service", "latest", nil)
+	require.NoError(t, err)
+	defer func() {
+		require.NoError(t, pool.Purge(resource), "failed to remove container")
+	}()
+	// wait for docker to start
+	require.NoError(t, pool.Retry(func() error {
+		var err error
+		var resp *http.Response
+		resp, err = http.Post(fmt.Sprintf("http://localhost:%s/receipts/process", resource.GetPort("8080/tcp")), "application/json", bytes.NewBuffer(body_bad_empty_docker))
 		if err != nil {
 			return err
 		}
