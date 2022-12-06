@@ -270,7 +270,7 @@ func TestGetPoints_2(t *testing.T) {
 	assert.Equal(t, body2_pts, int(points))
 }
 
-// Bad Receipts
+// Bad Input - Process Receipt
 func TestProcessReceipt_Bad_Date(t *testing.T) {
 	// set up router, recorder, and request
 	router := setupRouter()
@@ -346,6 +346,7 @@ func TestProcessReceipt_Bad_Negative_Price(t *testing.T) {
 	assert.Contains(t, w.Body.String(), `"The receipt is invalid"`)
 }
 
+// Bad Input - Get Points
 func TestGetPoints_Bad_ID(t *testing.T) {
 	// set up router, recorder, and request
 	router := setupRouter()
@@ -362,7 +363,24 @@ func TestGetPoints_Bad_ID(t *testing.T) {
 	assert.Contains(t, w.Body.String(), `"No receipt found for that id"`)
 }
 
+func TestGetPoints_Bad_Empty_ID(t *testing.T) {
+	// set up router, recorder, and request
+	router := setupRouter()
+	w := httptest.NewRecorder()
+
+	// use a bad ID to query for points
+	req, err := http.NewRequest(http.MethodGet, "/receipts//points", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusNotFound, w.Code)
+	assert.Contains(t, w.Body.String(), `"No receipt found for that id"`)
+}
+
 // TODO - consider other edge cases other than bad input
 
 // TODO - how to handle duplicate receipts? - this should not be allowed
 // Idea - generate unique ID based on complete receipt body, and check if ID already exists in map
+// Reconsideration - duplicate receipts should be allowed, since identical transactions can occur

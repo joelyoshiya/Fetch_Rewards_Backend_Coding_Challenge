@@ -136,15 +136,15 @@ func processReceipt(c *gin.Context) {
 	var r Receipt
 	// var s ServerReceipt
 
-	// generate ID
-	id := uuid.New().String()
-
 	// bind JSON to receipt object - upon error, return bad request
 	// unmarshaling JSON to struct, type checking for all fields
 	if err := c.ShouldBindJSON(&r); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"description": "The receipt is invalid"})
 		return
 	}
+
+	// checks - if any fail, return bad request
+
 	// check if all fields populated
 	if r.Retailer == "" || r.Total == "" || r.PurchaseDate == "" || r.PurchaseTime == "" || r.Items == nil {
 		c.JSON(http.StatusBadRequest, gin.H{"description": "The receipt is invalid"})
@@ -198,7 +198,7 @@ func processReceipt(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"description": "The receipt is invalid"})
 		return
 	}
-	// test it total is negative
+	// check if total is negative
 	total, _ := strconv.ParseFloat(r.Total, 64)
 	if total < 0 {
 		c.JSON(http.StatusBadRequest, gin.H{"description": "The receipt is invalid"})
@@ -207,6 +207,9 @@ func processReceipt(c *gin.Context) {
 
 	// process points
 	points := processPoints(r)
+
+	// generate ID
+	id := uuid.New().String()
 
 	// create a ReceiptPoints object and add to receipts map
 	(*rs).ReceiptsMap[id] = ReceiptPoints{r, points}
