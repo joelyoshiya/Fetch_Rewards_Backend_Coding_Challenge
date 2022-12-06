@@ -31,15 +31,18 @@ I've opted to use Docker to run the application. This allows for a consistent en
 
 ### Build
 
+A Dockerfile is included in the root of the project. To build the image, run the following command:
+
 - Run `docker build -t receipt-processor-service .` at the root of the project.
 
-### Run
+### Run The Service
 
 - Run `docker run -dp 8080:8080 --name receipt-rest-server receipt-processor-service` to start the service
 
 ## Test Environment
 
-- Note: Testing will require Go (version specified in Dockerfile receommended) and Docker to be installed on your machine.
+- Note: Testing will require Go (version specified in Dockerfile recommended) and Docker to be installed on your machine.
+  - Testing is primarily for my personal use, assuming engineers will be using their own means to test the service within a Docker container.
 - Make sure you're on the most up to date build: `docker build -t receipt-processor-service:latest .`
 - Run the command `go test -v ./main` at the root to run the tests.
 

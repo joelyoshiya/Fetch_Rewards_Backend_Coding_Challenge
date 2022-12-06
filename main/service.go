@@ -242,4 +242,4 @@ func main() {
 	r.Run() // listen and serve on default port 8080 - otherwise port defined in env variable PORT
 }
 
-// TODO get rid of ping route
+// TODO get rid of ping route - also in tests
