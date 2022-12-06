@@ -1,4 +1,4 @@
-# Receipt Processor - My Solution
+# Receipt Processor - Joel Yoshiya Foster
 
 ## Approach
 
@@ -11,7 +11,6 @@
   - Calculate the points for a receipt during processing
     - Makes GET requests to `/receipts/{id}/points` more efficient
     - Slightly less performant POST requests to `/receipts/process`, but better to do processing alongside validation
-
 
 ## Assumptions
 
@@ -59,8 +58,6 @@ A Dockerfile is included in the root of the project. To build the image, run the
 - `TestProcessReceipts_Bad_*` - tests the process endpoint with bad data, including empty and invalid receipt data
 - `TestGetPoints_Bad_*` - tests the get points endpoint with bad data, including empty and invalid ids
 
-
-
 ## Discussion
 
 how to handle duplicate receipts? - initially thought this should not be allowed.
@@ -73,3 +70,6 @@ how to handle duplicate receipts? - initially thought this should not be allowed
   - We would need to know the CustomerID to determine if a receipt is a duplicate
 
 ## Conclusion
+
+- Despite not being a seasoned Go developer, I've been learning Go recently and am enjoying it! This exercise showed me how elegant Go can be when implementing a REST API.
+- I've enjoyed working on this exercise, and I look forward to hearing your feedback!
