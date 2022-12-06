@@ -152,20 +152,6 @@ var body_valid_2_pts = 109
 var body1_id string
 var body2_id string
 
-func TestPingRoute(t *testing.T) {
-	// set up router, recorder, and request
-	router := setupRouter()
-
-	w := httptest.NewRecorder()
-	req, _ := http.NewRequest(http.MethodGet, "/ping", nil)
-	req.Header.Set("Content-Type", "application/json")
-	router.ServeHTTP(w, req)
-
-	// assert response
-	assert.Equal(t, http.StatusOK, w.Code)
-	assert.Equal(t, "pong", w.Body.String())
-}
-
 func TestProcessReceipt_1(t *testing.T) {
 	// set up router, recorder, and request
 	router := setupRouter()

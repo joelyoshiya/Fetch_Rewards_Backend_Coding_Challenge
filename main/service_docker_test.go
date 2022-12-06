@@ -150,40 +150,6 @@ var body_bad_empty_docker = []byte(``)
 var body_valid_1_pts_docker = 25
 var body_valid_2_pts_docker = 109
 
-func TestPing(t *testing.T) {
-	// setup docker
-	pool, err := dockertest.NewPool("")
-	require.NoError(t, err)
-	resource, err := pool.Run("receipt-processor-service", "latest", nil)
-	require.NoError(t, err)
-	defer func() {
-		require.NoError(t, pool.Purge(resource), "failed to remove container")
-	}()
-	// wait for docker to start
-	require.NoError(t, pool.Retry(func() error {
-		var err error
-		var resp *http.Response
-		resp, err = http.Get(fmt.Sprintf("http://localhost:%s/ping", resource.GetPort("8080/tcp")))
-		if err != nil {
-			return err
-		}
-		defer resp.Body.Close()
-		if resp.StatusCode != http.StatusOK {
-			return fmt.Errorf("received non-200 response: %d", resp.StatusCode)
-		}
-		var body []byte
-		body, err = io.ReadAll(resp.Body)
-		if err != nil {
-			return err
-		}
-		if string(body) != "pong" {
-			return fmt.Errorf("received unexpected body: %s", body)
-		}
-		return nil
-	}))
-
-}
-
 // post and process receipt to server running on docker container
 // also test if valid points returned
 func TestProcessReceipt_1_Docker(t *testing.T) {

@@ -52,9 +52,6 @@ var rs = NewReceipts() // pointer to Receipts object
 func setupRouter() *gin.Engine {
 	r := gin.Default()
 	// define routes
-	r.GET("/ping", func(c *gin.Context) {
-		c.String(http.StatusOK, "pong")
-	})
 	r.POST("/receipts/process", processReceipt)
 	r.GET("/receipts/:id/points", getPoints)
 	return r
