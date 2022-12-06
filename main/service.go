@@ -12,7 +12,7 @@ import (
 	"github.com/google/uuid"
 )
 
-// define structs
+// Struct definitions & constructors
 
 // struct representing inbound receipt
 type Receipt struct {
@@ -38,15 +38,19 @@ type Receipts struct {
 	ReceiptsMap map[string]ReceiptPoints `json:"receipts"`
 }
 
-// constructor for receipts
+// constructor for Receipts
 func NewReceipts() *Receipts {
 	var rs Receipts
 	rs.ReceiptsMap = make(map[string]ReceiptPoints)
 	return &rs
 }
 
+// Internal data
+
 // global receipts object - in place of persisting data
 var rs = NewReceipts() // pointer to Receipts object
+
+// Internal functions
 
 // setup router
 func setupRouter() *gin.Engine {
@@ -56,8 +60,6 @@ func setupRouter() *gin.Engine {
 	r.GET("/receipts/:id/points", getPoints)
 	return r
 }
-
-// Internal functions
 
 // Calculate points for receipt - based on ruleset given
 // Assumes a valid receipt is passed in
@@ -206,7 +208,7 @@ func processReceipt(c *gin.Context) {
 	(*rs).ReceiptsMap[id] = ReceiptPoints{r, points}
 
 	// return status created and receipt ID
-	c.IndentedJSON(http.StatusCreated, gin.H{"id": id})
+	c.JSON(http.StatusCreated, gin.H{"id": id})
 }
 
 // Path: /receipts/{id}/points
@@ -219,10 +221,10 @@ func getPoints(c *gin.Context) {
 	// get receipt object with ID from receipts
 	rp, present := (*rs).ReceiptsMap[id]
 	if !present {
-		c.IndentedJSON(http.StatusNotFound, gin.H{"description": "No receipt found for that id"})
+		c.JSON(http.StatusNotFound, gin.H{"description": "No receipt found for that id"})
 		return
 	} else {
-		c.IndentedJSON(http.StatusOK, gin.H{"points": rp.Points})
+		c.JSON(http.StatusOK, gin.H{"points": rp.Points})
 	}
 
 }
@@ -232,5 +234,3 @@ func main() {
 	r := setupRouter()
 	r.Run() // listen and serve on default port 8080 - otherwise port defined in env variable PORT
 }
-
-// TODO get rid of ping route - also in tests
