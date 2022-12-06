@@ -143,8 +143,8 @@ var body_bad_negative_price = []byte(`{
 	  }`)
 
 // expected points for body1 and body2
-var body1_pts = 25
-var body2_pts = 109
+var body_valid_1_pts = 25
+var body_valid_2_pts = 109
 
 // set upon successful return of TestProcessReceipt_1 and TestProcessReceipt_2
 var body1_id string
@@ -238,7 +238,7 @@ func TestGetPoints_1(t *testing.T) {
 	points := resp2["points"].(float64)
 
 	// check if points valid
-	assert.Equal(t, body1_pts, int(points))
+	assert.Equal(t, body_valid_1_pts, int(points))
 
 }
 func TestGetPoints_2(t *testing.T) {
@@ -267,7 +267,7 @@ func TestGetPoints_2(t *testing.T) {
 	points := resp2["points"].(float64)
 
 	// check if points valid
-	assert.Equal(t, body2_pts, int(points))
+	assert.Equal(t, body_valid_2_pts, int(points))
 }
 
 // Bad Input - Process Receipt
@@ -378,9 +378,3 @@ func TestGetPoints_Bad_Empty_ID(t *testing.T) {
 	assert.Equal(t, http.StatusNotFound, w.Code)
 	assert.Contains(t, w.Body.String(), `"No receipt found for that id"`)
 }
-
-// TODO - consider other edge cases other than bad input
-
-// TODO - how to handle duplicate receipts? - this should not be allowed
-// Idea - generate unique ID based on complete receipt body, and check if ID already exists in map
-// Reconsideration - duplicate receipts should be allowed, since identical transactions can occur
