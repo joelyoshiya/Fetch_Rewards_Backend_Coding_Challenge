@@ -77,11 +77,30 @@ var body_bad_empty_date = []byte(`{
 	"total": "9.00"
 	  }`)
 
-var body_bad_empty_items = []byte(`{
+var body_bad_empty_items_arr = []byte(`{
 	"retailer": "M&M Corner Market",
 	"purchaseDate": "2022-03-20",
 	"purchaseTime": "14:33",
 	"items": []
+	"total": "9.00"
+	  }`)
+
+var body_bad_empty_items_elts = []byte(`{
+	"retailer": "M&M Corner Market",
+	"purchaseDate": "2022-03-20",
+	"purchaseTime": "14:33",
+	"items": [
+	  {
+		"shortDescription": "",
+		"price": "2.25"
+	  },{
+		"shortDescription": "Gatorade",
+		"price": "2.25"
+	  },{
+		"shortDescription": "Gatorade",
+		"price": "2.25"
+	  }
+	],
 	"total": "9.00"
 	  }`)
 
@@ -229,11 +248,26 @@ func TestProcessReceipt_Bad_Date(t *testing.T) {
 	assert.Contains(t, w.Body.String(), `"The receipt is invalid"`)
 }
 
+func TestProcessReceipt_Bad_Items_Arr(t *testing.T) {
+	// set up router, recorder, and request
+	router := setupRouter()
+	w := httptest.NewRecorder()
+	req, err := http.NewRequest(http.MethodPost, "/receipts/process", bytes.NewBuffer(body_bad_empty_items_arr))
+	if err != nil {
+		t.Fatal(err)
+	}
+	router.ServeHTTP(w, req)
+
+	// assert response
+	assert.Equal(t, http.StatusBadRequest, w.Code)
+	assert.Contains(t, w.Body.String(), `"The receipt is invalid"`)
+}
+
 func TestProcessReceipt_Bad_Items(t *testing.T) {
 	// set up router, recorder, and request
 	router := setupRouter()
 	w := httptest.NewRecorder()
-	req, err := http.NewRequest(http.MethodPost, "/receipts/process", bytes.NewBuffer(body_bad_empty_items))
+	req, err := http.NewRequest(http.MethodPost, "/receipts/process", bytes.NewBuffer(body_bad_empty_items_elts))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -263,7 +297,4 @@ func TestGetPoints_Bad_ID(t *testing.T) {
 // TODO - consider other edge cases other than bad input
 
 // TODO - how to handle duplicate receipts? - this should not be allowed
-// Idea - geneate unique ID based on complete receipt body, and check if ID already exists in map
-
-// TODO - how to handle duplicate items within a receipt? - This should be fine, since items can be repeatedly bought within a receipt
-// TODO - how to handle duplicate items across receipts? - This should be fine, since items can be repeatedly bought across receipts
+// Idea - generate unique ID based on complete receipt body, and check if ID already exists in map

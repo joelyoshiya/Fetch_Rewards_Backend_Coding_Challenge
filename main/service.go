@@ -156,6 +156,14 @@ func processReceipt(c *gin.Context) {
 		return
 	}
 
+	// check if bad data in r.Items
+	for _, item := range r.Items {
+		if item.ShortDescription == "" || item.Price == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"description": "The receipt is invalid"})
+			return
+		}
+	}
+
 	// process points
 	points := processPoints(r)
 
