@@ -104,6 +104,44 @@ var body_bad_empty_items_elts = []byte(`{
 	"total": "9.00"
 	  }`)
 
+var body_bad_negative_total = []byte(`{
+	"retailer": "M&M Corner Market",
+	"purchaseDate": "2022-03-20",
+	"purchaseTime": "14:33",
+	"items": [
+	  {
+		"shortDescription": "Gatorade",
+		"price": "2.25"
+	  },{
+		"shortDescription": "Gatorade",
+		"price": "2.25"
+	  },{
+		"shortDescription": "Gatorade",
+		"price": "2.25"
+	  }
+	],
+	"total": "-7.75"
+	  }`)
+
+var body_bad_negative_price = []byte(`{
+	"retailer": "M&M Corner Market",
+	"purchaseDate": "2022-03-20",
+	"purchaseTime": "14:33",
+	"items": [
+	  {
+		"shortDescription": "Gatorade",
+		"price": "2.25"
+	  },{
+		"shortDescription": "Gatorade",
+		"price": "2.25"
+	  },{
+		"shortDescription": "Gatorade",
+		"price": "-2.25"
+	  }
+	],
+	"total": "7.75"
+	  }`)
+
 // expected points for body1 and body2
 var body1_pts = 25
 var body2_pts = 109
@@ -232,7 +270,7 @@ func TestGetPoints_2(t *testing.T) {
 	assert.Equal(t, body2_pts, int(points))
 }
 
-// TODO - write tests with various types of bad input
+// Bad Receipts
 func TestProcessReceipt_Bad_Date(t *testing.T) {
 	// set up router, recorder, and request
 	router := setupRouter()
@@ -268,6 +306,36 @@ func TestProcessReceipt_Bad_Items(t *testing.T) {
 	router := setupRouter()
 	w := httptest.NewRecorder()
 	req, err := http.NewRequest(http.MethodPost, "/receipts/process", bytes.NewBuffer(body_bad_empty_items_elts))
+	if err != nil {
+		t.Fatal(err)
+	}
+	router.ServeHTTP(w, req)
+
+	// assert response
+	assert.Equal(t, http.StatusBadRequest, w.Code)
+	assert.Contains(t, w.Body.String(), `"The receipt is invalid"`)
+}
+
+func TestProcessReceipt_Bad_Negative_Total(t *testing.T) {
+	// set up router, recorder, and request
+	router := setupRouter()
+	w := httptest.NewRecorder()
+	req, err := http.NewRequest(http.MethodPost, "/receipts/process", bytes.NewBuffer(body_bad_negative_total))
+	if err != nil {
+		t.Fatal(err)
+	}
+	router.ServeHTTP(w, req)
+
+	// assert response
+	assert.Equal(t, http.StatusBadRequest, w.Code)
+	assert.Contains(t, w.Body.String(), `"The receipt is invalid"`)
+}
+
+func TestProcessReceipt_Bad_Negative_Price(t *testing.T) {
+	// set up router, recorder, and request
+	router := setupRouter()
+	w := httptest.NewRecorder()
+	req, err := http.NewRequest(http.MethodPost, "/receipts/process", bytes.NewBuffer(body_bad_negative_price))
 	if err != nil {
 		t.Fatal(err)
 	}

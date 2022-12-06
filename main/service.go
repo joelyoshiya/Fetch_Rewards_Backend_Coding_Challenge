@@ -6,6 +6,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -158,10 +159,50 @@ func processReceipt(c *gin.Context) {
 
 	// check if bad data in r.Items
 	for _, item := range r.Items {
+		// check for empty vals
 		if item.ShortDescription == "" || item.Price == "" {
 			c.JSON(http.StatusBadRequest, gin.H{"description": "The receipt is invalid"})
 			return
 		}
+		// check for invalid price
+		price, err := strconv.ParseFloat(item.Price, 64)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"description": "The receipt is invalid"})
+			return
+		}
+		// check that price is above 0
+		if price < 0 {
+			c.JSON(http.StatusBadRequest, gin.H{"description": "The receipt is invalid"})
+			return
+		}
+
+	}
+
+	// check if purchase date is valid
+	_, err := time.Parse("2006-01-02", r.PurchaseDate)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"description": "The receipt is invalid"})
+		return
+	}
+
+	// check if purchase time is valid
+	_, err = time.Parse("15:04", r.PurchaseTime)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"description": "The receipt is invalid"})
+		return
+	}
+
+	// check if total is valid
+	_, err = strconv.ParseFloat(r.Total, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"description": "The receipt is invalid"})
+		return
+	}
+	// test it total is negative
+	total, _ := strconv.ParseFloat(r.Total, 64)
+	if total < 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"description": "The receipt is invalid"})
+		return
 	}
 
 	// process points
