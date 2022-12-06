@@ -25,6 +25,18 @@
 - Gin Web Framework
 - Other dependencies are listed in `go.mod`
 
+## Execution
+
+I've opted to use Docker to run the application. This allows for a consistent environment across all platforms.
+
+### Build
+
+- Run `docker build -t receipt-processor-service .` at the root.
+
+### Run
+
+- Run `docker run -p 8080:8080 receipt-processor-service` to start the service
+
 ## Test Environment
 
 Run tests via `go test` in the `/main` directory

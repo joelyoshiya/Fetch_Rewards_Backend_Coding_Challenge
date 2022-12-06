@@ -1,12 +1,16 @@
-FROM golang:1.18
+# alpine chosen for small footprint
+FROM golang:1.18.3-alpine
 
-WORKDIR /usr/src/app
+WORKDIR /app
 
 # pre-copy/cache go.mod for pre-downloading dependencies and only redownloading them in subsequent builds if they change
 COPY go.mod go.sum ./
 RUN go mod download && go mod verify
 
-COPY . .
-RUN go build -v -o /usr/local/bin/app ./...
+COPY ./main/* .
+# compile the app
+RUN go build -o /receipts-processor-service
 
-CMD ["app"]
+EXPOSE 8080
+
+CMD ["/receipts-processor-service"]
