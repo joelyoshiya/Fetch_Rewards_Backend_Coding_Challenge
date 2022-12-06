@@ -35,11 +35,12 @@ I've opted to use Docker to run the application. This allows for a consistent en
 
 ### Run
 
-- Run `docker run -p 8080:8080 receipt-processor-service` to start the service
+- Run `docker run -dp 8080:8080 --name receipt-rest-server receipt-processor-service` to start the service
 
 ## Test Environment
 
-Run tests via `go test` in the `/main` directory
+- Make sure you're on the most up to date build: `docker build -t receipt-processor-service:latest .`
+- Run the command `go test -v ./main` at the root to run the tests.
 
 ## Discussion
 

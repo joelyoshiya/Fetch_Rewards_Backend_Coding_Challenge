@@ -9,8 +9,8 @@ RUN go mod download && go mod verify
 
 COPY ./main/* .
 # compile the app
-RUN go build -o /receipts-processor-service
+RUN go build -o /receipt-processor-service
 
 EXPOSE 8080
 
-CMD ["/receipts-processor-service"]
+CMD ["/receipt-processor-service"]
