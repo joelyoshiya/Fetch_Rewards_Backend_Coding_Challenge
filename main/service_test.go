@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var body1 = []byte(`{
+var body_valid_1 = []byte(`{
 	"retailer": "Target",
 	"purchaseDate": "2022-01-01",
 	"purchaseTime": "13:01",
@@ -35,7 +35,7 @@ var body1 = []byte(`{
 	"total": "35.35"
   }`)
 
-var body2 = []byte(`{
+var body_valid_2 = []byte(`{
 	"retailer": "M&M Corner Market",
 	"purchaseDate": "2022-03-20",
 	"purchaseTime": "14:33",
@@ -58,7 +58,7 @@ var body2 = []byte(`{
   }`)
 
 // body with no purchaseDate entry - should fail
-var body_bad_1 = []byte(`{
+var body_bad_empty_date = []byte(`{
 	"retailer": "M&M Corner Market",
 	"purchaseDate": "",
 	"purchaseTime": "14:33",
@@ -77,7 +77,7 @@ var body_bad_1 = []byte(`{
 	"total": "9.00"
 	  }`)
 
-var body_bad_2 = []byte(`{
+var body_bad_empty_items = []byte(`{
 	"retailer": "M&M Corner Market",
 	"purchaseDate": "2022-03-20",
 	"purchaseTime": "14:33",
@@ -111,7 +111,7 @@ func TestProcessReceipt_1(t *testing.T) {
 	// set up router, recorder, and request
 	router := setupRouter()
 	w := httptest.NewRecorder()
-	req, err := http.NewRequest(http.MethodPost, "/receipts/process", bytes.NewBuffer(body1))
+	req, err := http.NewRequest(http.MethodPost, "/receipts/process", bytes.NewBuffer(body_valid_1))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -136,7 +136,7 @@ func TestProcessReceipt_2(t *testing.T) {
 	// set up router, recorder, and request
 	router := setupRouter()
 	w := httptest.NewRecorder()
-	req, err := http.NewRequest(http.MethodPost, "/receipts/process", bytes.NewBuffer(body2))
+	req, err := http.NewRequest(http.MethodPost, "/receipts/process", bytes.NewBuffer(body_valid_2))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -218,7 +218,7 @@ func TestProcessReceipt_Bad_Date(t *testing.T) {
 	// set up router, recorder, and request
 	router := setupRouter()
 	w := httptest.NewRecorder()
-	req, err := http.NewRequest(http.MethodPost, "/receipts/process", bytes.NewBuffer(body_bad_1))
+	req, err := http.NewRequest(http.MethodPost, "/receipts/process", bytes.NewBuffer(body_bad_empty_date))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -233,7 +233,7 @@ func TestProcessReceipt_Bad_Items(t *testing.T) {
 	// set up router, recorder, and request
 	router := setupRouter()
 	w := httptest.NewRecorder()
-	req, err := http.NewRequest(http.MethodPost, "/receipts/process", bytes.NewBuffer(body_bad_2))
+	req, err := http.NewRequest(http.MethodPost, "/receipts/process", bytes.NewBuffer(body_bad_empty_items))
 	if err != nil {
 		t.Fatal(err)
 	}
