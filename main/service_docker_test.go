@@ -277,12 +277,6 @@ func TestProcessReceipt_2_Docker(t *testing.T) {
 		if err != nil {
 			return err
 		}
-		return nil
-	}))
-	// wait for docker to start
-	require.NoError(t, pool.Retry(func() error {
-		var err error
-		var resp *http.Response
 		resp, err = http.Get(fmt.Sprintf("http://localhost:%s/receipts/%s/points", resource.GetPort("8080/tcp"), id))
 		if err != nil {
 			return err
@@ -291,12 +285,12 @@ func TestProcessReceipt_2_Docker(t *testing.T) {
 		if resp.StatusCode != http.StatusOK {
 			return fmt.Errorf("received non-200 response: %d", resp.StatusCode)
 		}
-		var body []byte
-		body, err = io.ReadAll(resp.Body)
+		var body2 []byte
+		body2, err = io.ReadAll(resp.Body)
 		if err != nil {
 			return err
 		}
-		pts, err = jsonparser.GetInt(body, "points")
+		pts, err = jsonparser.GetInt(body2, "points")
 		if err != nil {
 			return err
 		}
