@@ -303,3 +303,181 @@ func TestProcessReceipt_2_Docker(t *testing.T) {
 	require.Equal(t, body_valid_2_pts_docker, int(pts))
 
 }
+
+// Bad Input - Process Receipt
+
+func TestProcessReceipt_Bad_Date_Docker(t *testing.T) {
+	// setup docker
+	pool, err := dockertest.NewPool("")
+	require.NoError(t, err)
+	resource, err := pool.Run("receipt-processor-service", "latest", nil)
+	require.NoError(t, err)
+	defer func() {
+		require.NoError(t, pool.Purge(resource), "failed to remove container")
+	}()
+	// wait for docker to start
+	require.NoError(t, pool.Retry(func() error {
+		var err error
+		var resp *http.Response
+		resp, err = http.Post(fmt.Sprintf("http://localhost:%s/receipts/process", resource.GetPort("8080/tcp")), "application/json", bytes.NewBuffer(body_bad_empty_date_docker))
+		if err != nil {
+			return err
+		}
+		defer resp.Body.Close()
+		if resp.StatusCode != http.StatusBadRequest {
+			return fmt.Errorf("received non-400 response: %d", resp.StatusCode)
+		}
+		return nil
+	}))
+}
+
+func TestProcessReceipt_Bad_Items_Empty_Arr_Docker(t *testing.T) {
+	// setup docker
+	pool, err := dockertest.NewPool("")
+	require.NoError(t, err)
+	resource, err := pool.Run("receipt-processor-service", "latest", nil)
+	require.NoError(t, err)
+	defer func() {
+		require.NoError(t, pool.Purge(resource), "failed to remove container")
+	}()
+	// wait for docker to start
+	require.NoError(t, pool.Retry(func() error {
+		var err error
+		var resp *http.Response
+		resp, err = http.Post(fmt.Sprintf("http://localhost:%s/receipts/process", resource.GetPort("8080/tcp")), "application/json", bytes.NewBuffer(body_bad_empty_items_arr_docker))
+		if err != nil {
+			return err
+		}
+		defer resp.Body.Close()
+		if resp.StatusCode != http.StatusBadRequest {
+			return fmt.Errorf("received non-400 response: %d", resp.StatusCode)
+		}
+		return nil
+	}))
+}
+
+func TestProcessReceipt_Bad_Items_Empty_Item_Docker(t *testing.T) {
+	// setup docker
+	pool, err := dockertest.NewPool("")
+	require.NoError(t, err)
+	resource, err := pool.Run("receipt-processor-service", "latest", nil)
+	require.NoError(t, err)
+	defer func() {
+		require.NoError(t, pool.Purge(resource), "failed to remove container")
+	}()
+	// wait for docker to start
+	require.NoError(t, pool.Retry(func() error {
+		var err error
+		var resp *http.Response
+		resp, err = http.Post(fmt.Sprintf("http://localhost:%s/receipts/process", resource.GetPort("8080/tcp")), "application/json", bytes.NewBuffer(body_bad_empty_items_elts_docker))
+		if err != nil {
+			return err
+		}
+		defer resp.Body.Close()
+		if resp.StatusCode != http.StatusBadRequest {
+			return fmt.Errorf("received non-400 response: %d", resp.StatusCode)
+		}
+		return nil
+	}))
+}
+
+func TestProcessReceipt_Bad_Negative_Total_Docker(t *testing.T) {
+	// setup docker
+	pool, err := dockertest.NewPool("")
+	require.NoError(t, err)
+	resource, err := pool.Run("receipt-processor-service", "latest", nil)
+	require.NoError(t, err)
+	defer func() {
+		require.NoError(t, pool.Purge(resource), "failed to remove container")
+	}()
+	// wait for docker to start
+	require.NoError(t, pool.Retry(func() error {
+		var err error
+		var resp *http.Response
+		resp, err = http.Post(fmt.Sprintf("http://localhost:%s/receipts/process", resource.GetPort("8080/tcp")), "application/json", bytes.NewBuffer(body_bad_negative_total_docker))
+		if err != nil {
+			return err
+		}
+		defer resp.Body.Close()
+		if resp.StatusCode != http.StatusBadRequest {
+			return fmt.Errorf("received non-400 response: %d", resp.StatusCode)
+		}
+		return nil
+	}))
+}
+
+func TestProcessReceipt_Bad_Negative_Item_Price_Docker(t *testing.T) {
+	// setup docker
+	pool, err := dockertest.NewPool("")
+	require.NoError(t, err)
+	resource, err := pool.Run("receipt-processor-service", "latest", nil)
+	require.NoError(t, err)
+	defer func() {
+		require.NoError(t, pool.Purge(resource), "failed to remove container")
+	}()
+	// wait for docker to start
+	require.NoError(t, pool.Retry(func() error {
+		var err error
+		var resp *http.Response
+		resp, err = http.Post(fmt.Sprintf("http://localhost:%s/receipts/process", resource.GetPort("8080/tcp")), "application/json", bytes.NewBuffer(body_bad_negative_price_docker))
+		if err != nil {
+			return err
+		}
+		defer resp.Body.Close()
+		if resp.StatusCode != http.StatusBadRequest {
+			return fmt.Errorf("received non-400 response: %d", resp.StatusCode)
+		}
+		return nil
+	}))
+}
+
+// Bad Input - Get Points
+func TestGetPoints_Bad_ID_Docker(t *testing.T) {
+	// setup docker
+	pool, err := dockertest.NewPool("")
+	require.NoError(t, err)
+	resource, err := pool.Run("receipt-processor-service", "latest", nil)
+	require.NoError(t, err)
+	defer func() {
+		require.NoError(t, pool.Purge(resource), "failed to remove container")
+	}()
+	// wait for docker to start
+	require.NoError(t, pool.Retry(func() error {
+		var err error
+		var resp *http.Response
+		resp, err = http.Get(fmt.Sprintf("http://localhost:%s/receipts/%s/points/", resource.GetPort("8080/tcp"), "bad_id"))
+		if err != nil {
+			return err
+		}
+		defer resp.Body.Close()
+		if resp.StatusCode != http.StatusNotFound {
+			return fmt.Errorf("received non-400 response: %d", resp.StatusCode)
+		}
+		return nil
+	}))
+}
+
+func TestGetPoints_Bad_Empty_ID_Docker(t *testing.T) {
+	// setup docker
+	pool, err := dockertest.NewPool("")
+	require.NoError(t, err)
+	resource, err := pool.Run("receipt-processor-service", "latest", nil)
+	require.NoError(t, err)
+	defer func() {
+		require.NoError(t, pool.Purge(resource), "failed to remove container")
+	}()
+	// wait for docker to start
+	require.NoError(t, pool.Retry(func() error {
+		var err error
+		var resp *http.Response
+		resp, err = http.Get(fmt.Sprintf("http://localhost:%s/receipts/%s/points/", resource.GetPort("8080/tcp"), ""))
+		if err != nil {
+			return err
+		}
+		defer resp.Body.Close()
+		if resp.StatusCode != http.StatusNotFound {
+			return fmt.Errorf("received non-400 response: %d", resp.StatusCode)
+		}
+		return nil
+	}))
+}
