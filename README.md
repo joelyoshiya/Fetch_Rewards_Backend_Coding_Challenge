@@ -2,6 +2,17 @@
 
 ## Approach
 
+- Create a `Receipt` struct to hold the data from the inbound JSON
+  - Bind the JSON to the `Receipt` struct
+  - Perform validation on the inbound JSON
+- Create a `Receipts` struct to hold a map of `ReceiptPoints` structs
+  - Create a `ReceiptPoints` struct to hold the points for a receipt
+  - Efficient lookup of points for a receipt by ID
+  - Calculate the points for a receipt during processing
+    - Makes GET requests to `/receipts/{id}/points` more efficient
+    - Slightly less performant POST requests to `/receipts/process`, but better to do processing alongside validation
+
+
 ## Assumptions
 
 - No persistence layer is required (for this exercise)
