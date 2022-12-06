@@ -77,6 +77,14 @@ var body_bad_1 = []byte(`{
 	"total": "9.00"
 	  }`)
 
+var body_bad_2 = []byte(`{
+	"retailer": "M&M Corner Market",
+	"purchaseDate": "2022-03-20",
+	"purchaseTime": "14:33",
+	"items": []
+	"total": "9.00"
+	  }`)
+
 // expected points for body1 and body2
 var body1_pts = 25
 var body2_pts = 109
@@ -206,7 +214,7 @@ func TestGetPoints_2(t *testing.T) {
 }
 
 // TODO - write tests with various types of bad input
-func TestProcessReceipt_No_Date(t *testing.T) {
+func TestProcessReceipt_Bad_Date(t *testing.T) {
 	// set up router, recorder, and request
 	router := setupRouter()
 	w := httptest.NewRecorder()
@@ -218,7 +226,38 @@ func TestProcessReceipt_No_Date(t *testing.T) {
 
 	// assert response
 	assert.Equal(t, http.StatusBadRequest, w.Code)
-	assert.Contains(t, w.Body.String(), "\"description\":\"The receipt is invalid\"")
+	assert.Contains(t, w.Body.String(), `"The receipt is invalid"`)
+}
+
+func TestProcessReceipt_Bad_Items(t *testing.T) {
+	// set up router, recorder, and request
+	router := setupRouter()
+	w := httptest.NewRecorder()
+	req, err := http.NewRequest(http.MethodPost, "/receipts/process", bytes.NewBuffer(body_bad_2))
+	if err != nil {
+		t.Fatal(err)
+	}
+	router.ServeHTTP(w, req)
+
+	// assert response
+	assert.Equal(t, http.StatusBadRequest, w.Code)
+	assert.Contains(t, w.Body.String(), `"The receipt is invalid"`)
+}
+
+func TestGetPoints_Bad_ID(t *testing.T) {
+	// set up router, recorder, and request
+	router := setupRouter()
+	w := httptest.NewRecorder()
+
+	// use a bad ID to query for points
+	req, err := http.NewRequest(http.MethodGet, "/receipts/123/points", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusNotFound, w.Code)
+	assert.Contains(t, w.Body.String(), `"No receipt found for that id"`)
 }
 
 // TODO - consider other edge cases other than bad input
