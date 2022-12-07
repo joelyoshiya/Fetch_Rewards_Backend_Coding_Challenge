@@ -14,7 +14,7 @@ import (
 
 // Struct definitions & constructors
 
-// struct representing inbound receipt
+// Struct representing inbound receipt
 type Receipt struct {
 	Retailer     string `json:"retailer"`
 	PurchaseDate string `json:"purchaseDate"`
@@ -26,19 +26,19 @@ type Receipt struct {
 	Total string `json:"total"`
 }
 
-// struct representing Receipt Points pair - used for storing receipts/points pairs
+// Struct representing Receipt Points pair - used for storing receipts/points pairs
 type ReceiptPoints struct {
 	Receipt Receipt `json:"receipt"`
 	Points  int     `json:"points"`
 }
 
-// struct representing Receipts - internal storage of receipts/points
+// Struct representing Receipts - internal storage of receipts/points
 type Receipts struct {
 	// store a map of receipts, points pairs accessed via ID
 	ReceiptsMap map[string]ReceiptPoints `json:"receipts"`
 }
 
-// constructor for Receipts
+// Constructor for Receipts
 func NewReceipts() *Receipts {
 	var rs Receipts
 	rs.ReceiptsMap = make(map[string]ReceiptPoints)
@@ -47,18 +47,69 @@ func NewReceipts() *Receipts {
 
 // Internal data
 
-// global receipts object - in place of persisting data
+// Global receipts object - in place of persisting data
 var rs = NewReceipts() // pointer to Receipts object
 
 // Internal functions - not exported
 
-// setup router
+// Setup router
 func setupRouter() *gin.Engine {
 	r := gin.Default()
 	// define routes
 	r.POST("/receipts/process", processReceipt)
 	r.GET("/receipts/:id/points", getPoints)
 	return r
+}
+
+// Validate receipt - make sure all fields are populated and valid
+// Any invalid fields will result in an invalid receipt
+func validateReceipt(r Receipt) bool {
+	// check if all fields populated
+	if r.Retailer == "" || r.Total == "" || r.PurchaseDate == "" || r.PurchaseTime == "" || r.Items == nil {
+		return false
+	}
+	// check if purchase date is valid
+	_, err := time.Parse("2006-01-02", r.PurchaseDate)
+	if err != nil {
+		return false
+	}
+	// check if purchase time is valid
+	_, err = time.Parse("15:04", r.PurchaseTime)
+	if err != nil {
+		return false
+	}
+	// check if total is valid
+	_, err = strconv.ParseFloat(r.Total, 64)
+	if err != nil {
+		return false
+	}
+	// check if total is negative
+	total, _ := strconv.ParseFloat(r.Total, 64)
+	if total < 0 {
+		return false
+	}
+	// check if r.Items meets minimum length requirement of 1
+	if r.Items != nil && len(r.Items) < 1 {
+		return false
+	}
+	// check if bad data in r.Items
+	for _, item := range r.Items {
+		// check for empty vals
+		if item.ShortDescription == "" || item.Price == "" {
+			return false
+		}
+		// check for invalid price
+		price, err := strconv.ParseFloat(item.Price, 64)
+		if err != nil {
+			return false
+		}
+		// check that price is above 0
+		if price < 0 {
+			return false
+		}
+
+	}
+	return true
 }
 
 // Calculate points for receipt - based on ruleset given
@@ -121,55 +172,6 @@ func processPoints(r Receipt) int {
 		timePoints += 10
 	}
 	return retailerPoints + totalPoints + itemCountPoints + itemPoints + datePoints + timePoints
-}
-
-func validateReceipt(r Receipt) bool {
-	// check if all fields populated
-	if r.Retailer == "" || r.Total == "" || r.PurchaseDate == "" || r.PurchaseTime == "" || r.Items == nil {
-		return false
-	}
-	// check if purchase date is valid
-	_, err := time.Parse("2006-01-02", r.PurchaseDate)
-	if err != nil {
-		return false
-	}
-	// check if purchase time is valid
-	_, err = time.Parse("15:04", r.PurchaseTime)
-	if err != nil {
-		return false
-	}
-	// check if total is valid
-	_, err = strconv.ParseFloat(r.Total, 64)
-	if err != nil {
-		return false
-	}
-	// check if total is negative
-	total, _ := strconv.ParseFloat(r.Total, 64)
-	if total < 0 {
-		return false
-	}
-	// check if r.Items meets minimum length requirement of 1
-	if r.Items != nil && len(r.Items) < 1 {
-		return false
-	}
-	// check if bad data in r.Items
-	for _, item := range r.Items {
-		// check for empty vals
-		if item.ShortDescription == "" || item.Price == "" {
-			return false
-		}
-		// check for invalid price
-		price, err := strconv.ParseFloat(item.Price, 64)
-		if err != nil {
-			return false
-		}
-		// check that price is above 0
-		if price < 0 {
-			return false
-		}
-
-	}
-	return true
 }
 
 // Internal Route Functions

@@ -1,26 +1,34 @@
 # Receipt Processor - Joel Yoshiya Foster
 
+This is a webservice that processes receipts and returns the number of points earned. The service is built with Golang and the Gin Web Framework, and containerized with Docker. Tests are written with the Go testing package, as well as Testify and Dockertest. The service conforms to the API described in `api.yml`.
+
+
 ## Approach
 
 - Create a `Receipt` struct to hold the data from the inbound JSON
   - Bind the JSON to the `Receipt` struct
   - Perform validation on the inbound JSON
+  - Process points post-validation
 - Create a `Receipts` struct to hold a map of `ReceiptPoints` structs
   - Create a `ReceiptPoints` struct to hold the points for a receipt
-  - Efficient lookup of points for a receipt by ID
-  - Calculate the points for a receipt during processing
-    - Makes GET requests to `/receipts/{id}/points` more efficient
-    - Slightly less performant POST requests to `/receipts/process`, but better to do processing alongside validation
+    - keeps a receipt and its points tightly coupled in the same location
+  - A unique ID generated per valid receipt, with O(1) lookup
+
+Why process points during receipt processing?
+
+- Makes GET requests to `/receipts/{id}/points` more performant (assuming GET requests are more frequent than POST requests)
+- Slightly less performant POST requests to `/receipts/process`, but safer to process points immediately after validation.
 
 ## Assumptions
 
 - No persistence layer is required (for this exercise)
 - Negative prices, totals, and points are not inbound/outbound from the API
   - Have error handling to cover these cases
+- Assuming points tied to a receipt are immutable.
 
 ## Dependencies
 
-- Go version 1.18.3 darwin/amd64
+- Go version: go1.18.3 darwin/amd64
 - Gin Web Framework
 - Other dependencies are listed in `go.mod`
 
@@ -78,10 +86,12 @@ A Dockerfile is included in the root of the project. To build the image, run the
 
 ## Test Environment
 
+- Tests are found in the main directory
 - Note: Testing will require Go (version specified in Dockerfile recommended) and Docker to be installed on your machine.
   - Testing is primarily for my personal use, assuming engineers will be using their own means to test the service within a Docker container.
 - Make sure you're on the most up to date build: `docker build -t receipt-processor-service:latest .`
 - Run the command `go test -v ./main` at the root to run the tests.
+- Tests are written with the Go testing package, as well as Testify and Dockertest.
 
 ### Test Classes
 
