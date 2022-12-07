@@ -174,7 +174,7 @@ func TestProcessReceipt_1_Docker(t *testing.T) {
 			return err
 		}
 		defer resp.Body.Close()
-		if resp.StatusCode != http.StatusCreated {
+		if resp.StatusCode != http.StatusOK {
 			return fmt.Errorf("received non-201 response: %d", resp.StatusCode)
 		}
 		var body []byte
@@ -232,7 +232,7 @@ func TestProcessReceipt_2_Docker(t *testing.T) {
 			return err
 		}
 		defer resp.Body.Close()
-		if resp.StatusCode != http.StatusCreated {
+		if resp.StatusCode != http.StatusOK {
 			return fmt.Errorf("received non-201 response: %d", resp.StatusCode)
 		}
 		var body []byte

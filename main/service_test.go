@@ -164,7 +164,7 @@ func TestProcessReceipt_1(t *testing.T) {
 	router.ServeHTTP(w, req)
 
 	// assert response
-	assert.Equal(t, http.StatusCreated, w.Code)
+	assert.Equal(t, http.StatusOK, w.Code)
 	assert.Contains(t, w.Body.String(), `"id"`)
 
 	// grab id from response
@@ -188,7 +188,7 @@ func TestProcessReceipt_2(t *testing.T) {
 	router.ServeHTTP(w, req)
 
 	// assert response
-	assert.Equal(t, http.StatusCreated, w.Code)
+	assert.Equal(t, http.StatusOK, w.Code)
 	assert.Contains(t, w.Body.String(), `"id"`)
 
 	// grab id from response
