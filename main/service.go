@@ -207,7 +207,7 @@ func processReceipt(c *gin.Context) {
 	(*rs).ReceiptsMap[id] = ReceiptPoints{r, points}
 
 	// return status created and receipt ID
-	c.JSON(http.StatusCreated, gin.H{"id": id})
+	c.JSON(http.StatusOK, gin.H{"id": id})
 }
 
 // Path: /receipts/{id}/points
