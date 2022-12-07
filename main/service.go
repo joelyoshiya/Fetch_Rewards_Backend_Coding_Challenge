@@ -172,7 +172,7 @@ func validateReceipt(r Receipt) bool {
 	return true
 }
 
-// Route Functions
+// Internal Route Functions
 
 // Path: /receipts/process
 // Method: POST
@@ -189,7 +189,7 @@ func processReceipt(c *gin.Context) {
 		return
 	}
 
-	// validare receipt
+	// validate receipt
 	if !validateReceipt(r) {
 		c.JSON(http.StatusBadRequest, gin.H{"description": "The receipt is invalid"})
 		return
@@ -223,7 +223,6 @@ func getPoints(c *gin.Context) {
 	} else {
 		c.JSON(http.StatusOK, gin.H{"points": rp.Points})
 	}
-
 }
 
 // main function - start server
