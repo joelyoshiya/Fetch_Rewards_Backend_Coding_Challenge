@@ -61,4 +61,4 @@ After viewing the uncovered code, I discovered that it was mainly boolean return
 
 ## Conclusion
 
-As far as the scalability of this project, I would expand the program to use a database, as well as have a more flexible validator that can understand and validate a wider range of JSON inputs, as well as have a more modular points calculator that can be change on the fly. I would also reformat the testing library to include table-driven tests, and to include benchmarking.
+As far as the scalability of this project, I would expand the program to use a database, as well as have a more flexible validator that can understand and validate a wider range of JSON inputs, as well as have a more modular points calculator that can be changed on the fly. I would also reformat the testing library to include table-driven tests, and to include benchmarking.
